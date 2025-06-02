@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Dragon Cursor</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: none;
+            position: relative;
+        }
+
+        /* Animated background particles */
+        .bg-particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.6; }
+        }
+
+        /* Central interactive button */
+        .dragon-button {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffcd3c 100%);
+            border: none;
+            padding: 25px 50px;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 10px 30px rgba(255, 107, 53, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .dragon-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .dragon-button:hover {
+            transform: translate(-50%, -50%) scale(1.1) rotateZ(2deg);
+            box-shadow: 
+                0 20px 50px rgba(255, 107, 53, 0.6),
+                0 0 50px rgba(255, 107, 53, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .dragon-button:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translateX(100%);
+        }
+
+        .dragon-button:active {
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        /* Enhanced Dragon Cursor */
+        .dragon-cursor {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: drop-shadow(0 0 15px rgba(255, 107, 53, 0.8));
+            will-change: transform, filter;
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+
+        .dragon-cursor.clicking {
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 25px rgba(255, 107, 53, 1));
+        }
+
+        /* Enhanced Dragon SVG */
+        .dragon-svg {
+            width: 100%;
+            height: 100%;
+            animation: dragonIdle 4s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        @keyframes dragonIdle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(1deg) scale(1.01); }
+            50% { transform: rotate(0deg) scale(1.02); }
+            75% { transform: rotate(-1deg) scale(1.01); }
+        }
+
+        .dragon-cursor.moving .dragon-svg {
+            animation: dragonFly 0.8s ease-in-out infinite;
+        }
+
+        @keyframes dragonFly {
+            0%, 100% { transform: rotateZ(0deg) scale(1); }
+            25% { transform: rotateZ(-2deg) scale(1.02); }
+            50% { transform: rotateZ(0deg) scale(1.04); }
+            75% { transform: rotateZ(2deg) scale(1.02); }
+        }
+
+        /* Enhanced fire trail */
+        .fire-particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .fire-particle.large {
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #ff6b35 0%, #f7931e 30%, transparent 70%);
+            animation: fireLarge 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .fire-particle.medium {
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #f7931e 0%, #ffcd3c 40%, transparent 80%);
+            animation: fireMedium 1s ease-out forwards;
+        }
+
+        .fire-particle.small {
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #ffcd3c 0%, transparent 60%);
+            animation: fireSmall 0.8s ease-out forwards;
+        }
+
+        @keyframes fireLarge {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.3) translateY(-40px) rotate(180deg);
+            }
+        }
+
+        @keyframes fireMedium {
+            0% {
+                opacity: 0.8;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2) translateY(-30px) rotate(90deg);
+            }
+        }
+
+        @keyframes fireSmall {
+            0% {
+                opacity: 0.6;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.1) translateY(-20px);
+            }
+        }
+
+        /* Button explosion effect */
+        .explosion-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #ffcd3c 0%, #ff6b35 50%, transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.2);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .dragon-cursor {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .dragon-button {
+                padding: 20px 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dragon-cursor {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .dragon-button {
+                padding: 15px 30px;
+                font-size: 1rem;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background floating particles -->
+    <div class="bg-particles"></div>
+
+    <!-- Single central interactive button -->
+    <button class="dragon-button" id="dragonBtn">
+        🐉 Summon Dragon
+    </button>
+
+    <!-- Enhanced Dragon Cursor -->
+    <div class="dragon-cursor" id="dragonCursor">
+        <svg class="dragon-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+            <!-- Dragon Shadow -->
+            <ellipse cx="62" cy="85" rx="20" ry="8" fill="rgba(0,0,0,0.2)" opacity="0.3"/>
+            
+            <!-- Dragon Tail -->
+            <path d="M60 90 Q70 100 85 95 Q80 88 75 85 Q70 88 60 90" 
+                  fill="url(#tailGradient)" stroke="#654321" stroke-width="1"/>
+            
+            <!-- Dragon Body -->
+            <ellipse cx="60" cy="70" rx="18" ry="30" 
+                     fill="url(#bodyGradient)" stroke="#8B4513" stroke-width="2"/>
+            
+            <!-- Dragon Wings -->
+            <g class="dragon-wings">
+                <path d="M42 55 Q25 40 15 60 Q25 80 45 70 Z" 
+                      fill="url(#wingGradient)" stroke="#FF4500" stroke-width="1.5" opacity="0.9"/>
+                <path d="M78 55 Q95 40 105 60 Q95 80 75 70 Z" 
+                      fill="url(#wingGradient)" stroke="#FF4500" stroke-width="1.5" opacity="0.9"/>
+                <!-- Wing details -->
+                <path d="M35 60 Q30 50 25 65" stroke="#FF6B35" stroke-width="2" fill="none"/>
+                <path d="M85 60 Q90 50 95 65" stroke="#FF6B35" stroke-width="2" fill="none"/>
+            </g>
+            
+            <!-- Dragon Head -->
+            <ellipse cx="60" cy="45" rx="15" ry="18" 
+                     fill="url(#headGradient)" stroke="#8B4513" stroke-width="2"/>
+            
+            <!-- Dragon Horns -->
+            <path d="M50 30 L48 20 L52 25 Z" fill="#654321"/>
+            <path d="M70 30 L72 20 L68 25 Z" fill="#654321"/>
+            
+            <!-- Dragon Eyes -->
+            <circle cx="55" cy="40" r="4" fill="#FFD700" stroke="#FF8C00" stroke-width="1"/>
+            <circle cx="65" cy="40" r="4" fill="#FFD700" stroke="#FF8C00" stroke-width="1"/>
+            <circle cx="55" cy="40" r="2" fill="#8B0000"/>
+            <circle cx="65" cy="40" r="2" fill="#8B0000"/>
+            <circle cx="56" cy="39" r="0.5" fill="#FFD700"/>
+            <circle cx="66" cy="39" r="0.5" fill="#FFD700"/>
+            
+            <!-- Dragon Nostrils -->
+            <ellipse cx="57" cy="50" rx="1.5" ry="3" fill="#654321"/>
+            <ellipse cx="63" cy="50" rx="1.5" ry="3" fill="#654321"/>
+            
+            <!-- Dragon Mouth -->
+            <path d="M50 52 Q60 58 70 52" stroke="#654321" stroke-width="2" fill="none"/>
+            
+            <!-- Fire Breath Effect -->
+            <g id="fireBreath" style="opacity: 0;">
+                <ellipse cx="40" cy="48" rx="12" ry="6" fill="url(#fireGradient1)" opacity="0.8"/>
+                <ellipse cx="32" cy="48" rx="10" ry="5" fill="url(#fireGradient2)" opacity="0.9"/>
+                <ellipse cx="25" cy="48" rx="8" ry="4" fill="url(#fireGradient3)" opacity="0.7"/>
+            </g>
+            
+            <!-- Gradients -->
+            <defs>
+                <linearGradient id="bodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#D2691E"/>
+                    <stop offset="50%" style="stop-color:#CD853F"/>
+                    <stop offset="100%" style="stop-color:#8B4513"/>
+                </linearGradient>
+                <linearGradient id="headGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#F4A460"/>
+                    <stop offset="100%" style="stop-color:#D2691E"/>
+                </linearGradient>
+                <linearGradient id="wingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FF6B35"/>
+                    <stop offset="50%" style="stop-color:#FF8C42"/>
+                    <stop offset="100%" style="stop-color:#FF4500"/>
+                </linearGradient>
+                <linearGradient id="tailGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#8B4513"/>
+                    <stop offset="100%" style="stop-color:#654321"/>
+                </linearGradient>
+                <radialGradient id="fireGradient1">
+                    <stop offset="0%" style="stop-color:#FFD700"/>
+                    <stop offset="50%" style="stop-color:#FF6B35"/>
+                    <stop offset="100%" style="stop-color:#FF4500"/>
+                </radialGradient>
+                <radialGradient id="fireGradient2">
+                    <stop offset="0%" style="stop-color:#FFFF00"/>
+                    <stop offset="100%" style="stop-color:#FFD700"/>
+                </radialGradient>
+                <radialGradient id="fireGradient3">
+                    <stop offset="0%" style="stop-color:#FFFFFF"/>
+                    <stop offset="100%" style="stop-color:#FFFF00"/>
+                </radialGradient>
+            </defs>
+        </svg>
+    </div>
+
+    <script>
+        // Enhanced Dragon Cursor Controller
+        class EnhancedDragonCursor {
+            constructor() {
+                // Ultra-smooth configuration
+                this.config = {
+                    followSpeed: 0.08,           // Ultra-smooth following
+                    rotationSpeed: 0.05,         // Buttery smooth rotation
+                    trailInterval: 20,           // More frequent particles
+                    particleVariety: 4,          // More particle variety
+                    fireBreathDuration: 1000,    // Longer fire breath
+                    explosionParticles: 16,      // More explosion particles
+                    backgroundParticles: 20,     // More ambient particles
+                    smoothingFactor: 0.92,       // Movement smoothing
+                    minMovementThreshold: 0.5,   // Reduced jitter threshold
+                };
+
+                this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                this.dragon = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                this.smoothMouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+                this.targetRotation = 0;
+                this.currentRotation = 0;
+                this.isMoving = false;
+                this.isClicking = false;
+                this.lastTrailTime = 0;
+                this.velocity = { x: 0, y: 0 };
+                this.smoothVelocity = { x: 0, y: 0 };
+                this.frameCount = 0;
+                
+                this.init();
+            }
+
+            init() {
+                this.dragonElement = document.getElementById('dragonCursor');
+                this.fireBreath = document.getElementById('fireBreath');
+                this.dragonButton = document.getElementById('dragonBtn');
+                
+                this.setupEventListeners();
+                this.createBackgroundParticles();
+                this.animate();
+            }
+
+            setupEventListeners() {
+                let lastMoveTime = 0;
+                
+                document.addEventListener('mousemove', (e) => {
+                    this.handleMouseMove(e);
+                    
+                    // Detect if dragon is moving
+                    const now = Date.now();
+                    this.isMoving = now - lastMoveTime < 100;
+                    lastMoveTime = now;
+                    
+                    // Update moving class
+                    this.dragonElement.classList.toggle('moving', this.isMoving);
+                });
+
+                document.addEventListener('mousedown', () => this.handleMouseDown());
+                document.addEventListener('mouseup', () => this.handleMouseUp());
+                
+                // Enhanced button interactions
+                this.dragonButton.addEventListener('click', (e) => this.handleButtonClick(e));
+                this.dragonButton.addEventListener('mouseenter', () => this.handleButtonHover());
+                
+                // Handle window resize
+                window.addEventListener('resize', () => this.handleResize());
+            }
+
+            handleMouseMove(e) {
+                const prevMouse = { ...this.mouse };
+                this.mouse.x = e.clientX;
+                this.mouse.y = e.clientY;
+                
+                // Ultra-smooth mouse position interpolation
+                this.smoothMouse.x += (this.mouse.x - this.smoothMouse.x) * 0.15;
+                this.smoothMouse.y += (this.mouse.y - this.smoothMouse.y) * 0.15;
+                
+                // Calculate smooth velocity
+                this.velocity.x = this.mouse.x - prevMouse.x;
+                this.velocity.y = this.mouse.y - prevMouse.y;
+                
+                // Smooth velocity interpolation
+                this.smoothVelocity.x += (this.velocity.x - this.smoothVelocity.x) * 0.1;
+                this.smoothVelocity.y += (this.velocity.y - this.smoothVelocity.y) * 0.1;
+                
+                // Enhanced fire trail with smooth intervals
+                const now = Date.now();
+                if (now - this.lastTrailTime > this.config.trailInterval) {
+                    this.createEnhancedFireTrail();
+                    this.lastTrailTime = now;
+                }
+            }
+
+            handleMouseDown() {
+                this.isClicking = true;
+                this.dragonElement.classList.add('clicking');
+                
+                // Enhanced fire breath effect
+                this.fireBreath.style.opacity = '1';
+                this.fireBreath.style.transform = 'scale(1.2)';
+                
+                // Create burst of particles around dragon
+                this.createFireBurst();
+            }
+
+            handleMouseUp() {
+                this.isClicking = false;
+                this.dragonElement.classList.remove('clicking');
+                
+                setTimeout(() => {
+                    this.fireBreath.style.opacity = '0';
+                    this.fireBreath.style.transform = 'scale(1)';
+                }, this.config.fireBreathDuration);
+            }
+
+            handleButtonClick(e) {
+                // Prevent default cursor events
+                e.preventDefault();
+                
+                // Create explosion effect
+                this.createButtonExplosion(e.target);
+                
+                // Enhanced visual feedback
+                this.dragonButton.style.background = 'linear-gradient(135deg, #ffcd3c 0%, #ff6b35 50%, #f7931e 100%)';
+                setTimeout(() => {
+                    this.dragonButton.style.background = '';
+                }, 300);
+            }
+
+            handleButtonHover() {
+                // Create special particles around button
+                this.createButtonAura();
+            }
+
+            handleResize() {
+                // Adjust dragon position if window resizes
+                const rect = window.getBoundingClientRect || { width: window.innerWidth, height: window.innerHeight };
+                if (this.dragon.x > rect.width || this.dragon.y > rect.height) {
+                    this.dragon.x = Math.min(this.dragon.x, rect.width - 50);
+                    this.dragon.y = Math.min(this.dragon.y, rect.height - 50);
+                }
+            }
+
+            animate() {
+                this.frameCount++;
+                
+                // Use smoothed mouse position for ultra-smooth following
+                const deltaX = this.smoothMouse.x - this.dragon.x;
+                const deltaY = this.smoothMouse.y - this.dragon.y;
+                
+                // Ultra-smooth dragon movement with momentum
+                this.dragon.x += deltaX * this.config.followSpeed;
+                this.dragon.y += deltaY * this.config.followSpeed;
+                
+                // Movement detection with smoothing
+                const movementMagnitude = Math.sqrt(this.smoothVelocity.x ** 2 + this.smoothVelocity.y ** 2);
+                this.isMoving = movementMagnitude > this.config.minMovementThreshold;
+                this.dragonElement.classList.toggle('moving', this.isMoving);
+                
+                // Ultra-smooth rotation with advanced interpolation
+                if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
+                    this.targetRotation = Math.atan2(deltaY, deltaX) * (180 / Math.PI) + 90;
+                }
+                
+                // Advanced rotation smoothing with normalization
+                let rotationDiff = this.targetRotation - this.currentRotation;
+                while (rotationDiff > 180) rotationDiff -= 360;
+                while (rotationDiff < -180) rotationDiff += 360;
+                this.currentRotation += rotationDiff * this.config.rotationSpeed;
+                
+                // Smooth scaling with easing
+                const targetScale = this.isClicking ? 1.3 : (this.isMoving ? 1.1 : 1);
+                const currentScale = parseFloat(this.dragonElement.dataset.scale || '1');
+                const newScale = currentScale + (targetScale - currentScale) * 0.1;
+                this.dragonElement.dataset.scale = newScale.toString();
+                
+                // Apply ultra-smooth transforms with sub-pixel precision
+                const smoothX = Math.round((this.dragon.x - 40) * 10) / 10;
+                const smoothY = Math.round((this.dragon.y - 40) * 10) / 10;
+                const smoothRotation = Math.round(this.currentRotation * 10) / 10;
+                const smoothScale = Math.round(newScale * 100) / 100;
+                
+                this.dragonElement.style.transform = `translate3d(${smoothX}px, ${smoothY}px, 0) rotate(${smoothRotation}deg) scale(${smoothScale})`;
+                this.dragonElement.style.left = '0px';
+                this.dragonElement.style.top = '0px';
+                
+                // Apply velocity-based breathing effect
+                const breathingIntensity = 1 + (movementMagnitude * 0.01);
+                this.dragonElement.style.filter = `drop-shadow(0 0 ${15 * breathingIntensity}px rgba(255, 107, 53, ${0.8 * breathingIntensity}))`;
+                
+                requestAnimationFrame(() => this.animate());
+            }
+
+            createEnhancedFireTrail() {
+                // Create multiple particle types for richer trail
+                for (let i = 0; i < this.config.particleVariety; i++) {
+                    setTimeout(() => {
+                        this.createFireParticle(i);
+                    }, i * 10);
+                }
+            }
+
+            createFireParticle(type = 0) {
+                const particle = document.createElement('div');
+                particle.className = 'fire-particle';
+                
+                // Random offset based on velocity and dragon movement
+                const velocityFactor = Math.sqrt(this.velocity.x ** 2 + this.velocity.y ** 2) * 0.1;
+                const offsetX = (Math.random() - 0.5) * (20 + velocityFactor);
+                const offsetY = (Math.random() - 0.5) * (20 + velocityFactor);
+                
+                particle.style.left = (this.dragon.x + offsetX) + 'px';
+                particle.style.top = (this.dragon.y + offsetY) + 'px';
+                
+                // Different particle sizes and behaviors
+                const particleTypes = ['large', 'medium', 'small'];
+                const particleType = particleTypes[type % particleTypes.length];
+                particle.classList.add(particleType);
+                
+                document.body.appendChild(particle);
+                
+                // Enhanced cleanup
+                const lifetime = particleType === 'large' ? 1200 : (particleType === 'medium' ? 1000 : 800);
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, lifetime);
+            }
+
+            createFireBurst() {
+                // Create a burst of particles around the dragon when clicking
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'fire-particle large';
+                        
+                        const angle = (i / 8) * Math.PI * 2;
+                        const distance = 30;
+                        const offsetX = Math.cos(angle) * distance;
+                        const offsetY = Math.sin(angle) * distance;
+                        
+                        particle.style.left = (this.dragon.x + offsetX) + 'px';
+                        particle.style.top = (this.dragon.y + offsetY) + 'px';
+                        document.body.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 1200);
+                    }, i * 30);
+                }
+            }
+
+            createButtonExplosion(button) {
+                const rect = button.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                for (let i = 0; i < this.config.explosionParticles; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'explosion-particle';
+                        
+                        const angle = (i / this.config.explosionParticles) * Math.PI * 2;
+                        const distance = Math.random() * 100 + 50;
+                        const offsetX = Math.cos(angle) * distance;
+                        const offsetY = Math.sin(angle) * distance;
+                        
+                        particle.style.left = centerX + 'px';
+                        particle.style.top = centerY + 'px';
+                        particle.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                        
+                        document.body.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 1000);
+                    }, i * 20);
+                }
+            }
+
+            createButtonAura() {
+                const rect = this.dragonButton.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                for (let i = 0; i < 4; i++) {
+                    setTimeout(() => {
+                        const particle = document.createElement('div');
+                        particle.className = 'fire-particle medium';
+                        
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = 80 + Math.random() * 40;
+                        const offsetX = Math.cos(angle) * distance;
+                        const offsetY = Math.sin(angle) * distance;
+                        
+                        particle.style.left = (centerX + offsetX) + 'px';
+                        particle.style.top = (centerY + offsetY) + 'px';
+                        document.body.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            if (particle.parentNode) {
+                                particle.parentNode.removeChild(particle);
+                            }
+                        }, 1000);
+                    }, i * 100);
+                }
+            }
+
+            createBackgroundParticles() {
+                const container = document.querySelector('.bg-particles');
+                
+                for (let i = 0; i < this.config.backgroundParticles; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'bg-particle';
+                    
+                    const size = Math.random() * 20 + 10;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 8 + 's';
+                    particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                    
+                    container.appendChild(particle);
+                }
+            }
+        }
+
+        // Initialize enhanced dragon cursor
+        document.addEventListener('DOMContentLoaded', () => {
+            new EnhancedDragonCursor();
+        });
+    </script>
+</body>
+</html>
